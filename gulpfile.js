@@ -1,4 +1,4 @@
-
+"use strict";
 //Подключаем модули галпа
 const gulp = require('gulp');
 const concat = require('gulp-concat');
@@ -7,17 +7,17 @@ const cleanCSS = require('gulp-clean-css');
 const uglify = require('gulp-uglify');
 const del = require('del');
 const browserSync = require('browser-sync').create();
-
+const sass = require('gulp-sass');
+sass.compiler = require('node-sass');
+const sourcemaps = require('gulp-sourcemaps');
 //Порядок подключения css файлов
 const cssFiles = [
-    './src/css/main.css',
-    './src/css/media.css'
+    './src/css/main.css'
 ]
 //Порядок подключения js файлов
 const jsFiles = [
     './src/js/lib.js',
-    './src/js/main.js'
-]
+    './src/js/main.js']
 
 //Таск на стили CSS
 function styles() {
@@ -76,6 +76,16 @@ function watch() {
     gulp.watch("./*.html").on('change', browserSync.reload);
 }
 
+//Компилируем sass
+function cssPrepros() {
+    return gulp.src('./src/sass/**/*.scss')
+        .pipe(sourcemaps.init())
+        .pipe(sass().on('error', sass.logError))
+        .pipe(sourcemaps.write('../css/'))
+        .pipe(gulp.dest('./src/css'));
+}
+//Таск вызывающий функцию cssPrepros
+gulp.task('sass', cssPrepros);
 //Таск вызывающий функцию styles
 gulp.task('styles', styles);
 //Таск вызывающий функцию scripts
@@ -85,6 +95,6 @@ gulp.task('del', clean);
 //Таск для отслеживания изменений
 gulp.task('watch', watch);
 //Таск для удаления файлов в папке build и запуск styles и scripts
-gulp.task('build', gulp.series(clean, gulp.parallel(styles, scripts)));
+gulp.task('build', gulp.series(clean, "sass", gulp.parallel(styles, scripts)));
 //Таск запускает таск build и watch последовательно
 gulp.task('dev', gulp.series('build', 'watch')); 
