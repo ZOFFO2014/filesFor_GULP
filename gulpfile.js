@@ -10,17 +10,16 @@ const browserSync = require('browser-sync').create();
 const sass = require('gulp-sass');
 sass.compiler = require('node-sass');
 // const sourcemaps = require('gulp-sourcemaps');
-
 //Порядок подключения css файлов
 const cssFiles = [
-   './src/css/main.css'
+   './src/css/reset.css',
+   './src/css/header.css',
+   './src/css/media.css'
 ]
 //Порядок подключения js файлов
 const jsFiles = [
-   './src/js/lib.js',
-   './src/js/main.js'
+   './src/js/script.js',
 ]
-
 //Таск на стили CSS
 function styles() {
    //Шаблон для поиска файлов CSS
@@ -41,7 +40,6 @@ function styles() {
       .pipe(gulp.dest('./build/css'))
       .pipe(browserSync.stream());
 }
-
 //Таск на скрипты JS
 function scripts() {
    //Шаблон для поиска файлов JS
@@ -57,12 +55,10 @@ function scripts() {
       .pipe(gulp.dest('./build/js'))
       .pipe(browserSync.stream());
 }
-
 //Удалить всё в указанной папке
 function clean() {
    return del(['build/*'])
 }
-
 //Просматривать файлы
 function watch() {
    browserSync.init({
@@ -76,11 +72,11 @@ function watch() {
    gulp.watch('./src/css/**/*.css', styles)
    //Следить за JS файлами
    gulp.watch('./src/js/**/*.js', scripts)
+   // следить за нужными файламив папке
+   gulp.watch('./src/img/**/*.{png,jpg,svg}', copyFiles)
    //При изменении HTML запустить синхронизацию
    gulp.watch("./*.html").on('change', browserSync.reload);
 }
-
-
 //Компилируем sass
 function cssPrepros() {
    return gulp.src('./src/scss/**/*.scss')
@@ -88,6 +84,12 @@ function cssPrepros() {
       .pipe(sass().on('error', sass.logError))
       // .pipe(sourcemaps.write('../css/'))
       .pipe(gulp.dest('./src/css'));
+}
+//Копирует необходимые файлы в нужную директорию ( при необходимости не забыть заменить в Watch)
+function copyFiles() {
+   del(['build/img/*'])
+   return gulp.src(['./src/img/**/*.{png,jpg,svg}'], { base: './src/' })
+      .pipe(gulp.dest('./build'))
 }
 //Таск вызывающий функцию cssPrepros
 gulp.task('sass', cssPrepros);
@@ -97,9 +99,12 @@ gulp.task('styles', styles);
 gulp.task('scripts', scripts);
 //Таск для очистки папки build
 gulp.task('del', clean);
-//Таск для отслеживания изменений
+//Таск для копирования файлов
+gulp.task('copy', copyFiles);
+//Таск для слежения за файлами
 gulp.task('watch', watch);
 //Таск для удаления файлов в папке build и запуск styles и scripts
-gulp.task('build', gulp.series(clean, gulp.parallel(cssPrepros, styles, scripts)));
+gulp.task('build', gulp.series(clean, gulp.parallel(cssPrepros, styles, scripts, copyFiles)));
 //Таск запускает таск build и watch последовательно
 gulp.task('dev', gulp.series('build', 'watch'));
+
