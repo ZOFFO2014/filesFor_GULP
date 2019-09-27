@@ -57,13 +57,14 @@ function scripts() {
 }
 //Удалить всё в указанной папке
 function clean() {
-   return del(['build/*'])
+   return del(['build/*', '!build/*.html'])
+
 }
 //Просматривать файлы
 function watch() {
    browserSync.init({
       server: {
-         baseDir: "./"
+         baseDir: "./build/"
       }
    });
    //Следить за SCSS файлами
@@ -75,7 +76,7 @@ function watch() {
    // следить за нужными файламив папке
    gulp.watch('./src/img/**/*.{png,jpg,svg}', copyFiles)
    //При изменении HTML запустить синхронизацию
-   gulp.watch("./*.html").on('change', browserSync.reload);
+   gulp.watch("./**/*.html").on('change', browserSync.reload);
 }
 //Компилируем sass
 function cssPrepros() {

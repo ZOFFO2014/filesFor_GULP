@@ -17,7 +17,9 @@
     "node-sass": "^4.12.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "gulp-dev": "gulp dev",
+    "gulp-del": "gulp del",
+    "gulp-sass": "gulp sass"
   },
   "keywords": [],
   "author": "",
