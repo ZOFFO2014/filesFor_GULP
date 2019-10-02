@@ -10,21 +10,12 @@ const browserSync = require('browser-sync').create();
 const sass = require('gulp-sass');
 sass.compiler = require('node-sass');
 // const sourcemaps = require('gulp-sourcemaps');
-//Порядок подключения css файлов
-const cssFiles = [
-   './src/css/reset.css',
-   './src/css/header.css',
-   './src/css/media.css'
-]
-//Порядок подключения js файлов
-const jsFiles = [
-   './src/js/script.js',
-]
+
 //Таск на стили CSS
 function styles() {
    //Шаблон для поиска файлов CSS
    //Всей файлы по шаблону './src/css/**/*.css'
-   return gulp.src(cssFiles)
+   return gulp.src('src/**/*.css')
       //Объединение файлов в один
       .pipe(concat('style.css'))
       //Добавить префиксы
@@ -44,17 +35,25 @@ function styles() {
 function scripts() {
    //Шаблон для поиска файлов JS
    //Всей файлы по шаблону './src/js/**/*.js'
-   return gulp.src(jsFiles)
+   return gulp.src('./src/js/*.js')
       //Объединение файлов в один
       .pipe(concat('script.js'))
       //Минификация JS
-      // .pipe(uglify({
-      //    toplevel: true
-      // }))
       //Выходная папка для скриптов
       .pipe(gulp.dest('./build/js'))
       .pipe(browserSync.stream());
 }
+
+// gulp.task('compress', compressJS);
+
+// function compressJS() {
+//    return (
+//       gulp.src('./src/js/*.js')
+//          .pipe(uglify())
+//          .pipe(gulp.dest('./src/js/minify/'))
+//    );
+// }
+
 //Удалить всё в указанной папке
 function clean() {
    return del(['build/*', '!build/*.html'])
@@ -64,7 +63,7 @@ function clean() {
 function watch() {
    browserSync.init({
       server: {
-         baseDir: "./build/"
+         baseDir: "./"
       }
    });
    //Следить за SCSS файлами
